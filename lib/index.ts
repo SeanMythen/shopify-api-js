@@ -15,6 +15,7 @@ import {shopifyWebhooks, ShopifyWebhooks} from './webhooks';
 import {shopifyBilling, ShopifyBilling} from './billing';
 import {logger, ShopifyLogger} from './logger';
 import {SHOPIFY_API_LIBRARY_VERSION} from './version';
+import {ShopifyFlow, shopifyFlow} from './flow';
 
 export * from './error';
 export * from './session/classes';
@@ -44,6 +45,7 @@ export interface Shopify<
   billing: ShopifyBilling;
   logger: ShopifyLogger;
   rest: T;
+  flow: ShopifyFlow;
 }
 
 export function shopifyApi<T extends ShopifyRestResources>(
@@ -62,6 +64,7 @@ export function shopifyApi<T extends ShopifyRestResources>(
     billing: shopifyBilling(validatedConfig),
     logger: logger(validatedConfig),
     rest: {} as T,
+    flow: shopifyFlow(validatedConfig),
   };
 
   if (restResources) {
