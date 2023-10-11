@@ -1,3 +1,8 @@
+import type {
+  ResultOf,
+  TypedDocumentNode,
+  VariablesOf,
+} from '@graphql-typed-document-node/core';
 import {Method} from '@shopify/network';
 
 import {Headers} from '../../../runtime/http';
@@ -21,28 +26,45 @@ export type QueryParams =
   | number[]
   | {[key: string]: QueryParams};
 
-export interface GetRequestParams {
+export type RequestData<T> = T extends TypedDocumentNode<
+  infer _TResult,
+  infer TVariables
+>
+  ? {query: T; variables?: TVariables}
+  : {[key: string]: unknown} | string;
+
+export type ReturnBody<T> = T extends TypedDocumentNode<
+  ResultOf<T>,
+  VariablesOf<T>
+>
+  ? {data: ResultOf<T>}
+  : any;
+
+export interface GetRequestParams<T = any> {
   path: string;
   type?: DataType;
-  data?: {[key: string]: unknown} | string;
+  data?: RequestData<T>;
   query?: {[key: string]: QueryParams};
   extraHeaders?: HeaderParams;
   tries?: number;
 }
 
-export type PostRequestParams = GetRequestParams & {
-  data: {[key: string]: unknown} | string;
+export type PostRequestParams<T = any> = GetRequestParams<T> & {
+  data: RequestData<T>;
 };
 
-export type PutRequestParams = PostRequestParams;
+export type PutRequestParams<T = any> = PostRequestParams<T>;
 
-export type DeleteRequestParams = GetRequestParams;
+export type DeleteRequestParams<T = any> = GetRequestParams<T>;
 
-export type RequestParams = (GetRequestParams | PostRequestParams) & {
+export type RequestParams<T = any> = (
+  | GetRequestParams<T>
+  | PostRequestParams<T>
+) & {
   method: Method;
 };
 
-export interface RequestReturn<T = unknown> {
-  body: T;
+export interface RequestReturn<T = any> {
+  body: ReturnBody<T>;
   headers: Headers;
 }

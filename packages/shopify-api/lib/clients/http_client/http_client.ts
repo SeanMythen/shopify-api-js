@@ -56,33 +56,39 @@ export class HttpClient {
   /**
    * Performs a GET request on the given path.
    */
-  public async get<T = unknown>(params: GetRequestParams) {
+  public async get<T = any>(params: GetRequestParams<T>) {
     return this.request<T>({method: Method.Get, ...params});
   }
 
   /**
    * Performs a POST request on the given path.
    */
-  public async post<T = unknown>(params: PostRequestParams) {
-    return this.request<T>({method: Method.Post, ...params});
+  public async post<T = any>(params: PostRequestParams<T>) {
+    return this.request<T>({
+      method: Method.Post,
+      ...params,
+    });
   }
 
   /**
    * Performs a PUT request on the given path.
    */
-  public async put<T = unknown>(params: PutRequestParams) {
+  public async put<T = any>(params: PutRequestParams<T>) {
     return this.request<T>({method: Method.Put, ...params});
   }
 
   /**
    * Performs a DELETE request on the given path.
    */
-  public async delete<T = unknown>(params: DeleteRequestParams) {
-    return this.request<T>({method: Method.Delete, ...params});
+  public async delete<T = any>(params: DeleteRequestParams<T>) {
+    return this.request<T>({
+      method: Method.Delete,
+      ...params,
+    });
   }
 
-  protected async request<T = unknown>(
-    params: RequestParams,
+  protected async request<T = any>(
+    params: RequestParams<T>,
   ): Promise<RequestReturn<T>> {
     const maxTries = params.tries ? params.tries : 1;
     if (maxTries <= 0) {
@@ -110,7 +116,7 @@ export class HttpClient {
       ...params.extraHeaders,
       'User-Agent': userAgent,
     };
-    let body;
+    let body: any;
     if (params.method === Method.Post || params.method === Method.Put) {
       const type = (params as PostRequestParams).type ?? DataType.JSON;
       const data = (params as PostRequestParams).data;
@@ -267,7 +273,7 @@ export class HttpClient {
     }
   }
 
-  private async doRequest<T = unknown>(
+  private async doRequest<T = any>(
     request: NormalizedRequest,
   ): Promise<RequestReturn<T>> {
     const log = logger(this.httpClass().config);
@@ -331,9 +337,9 @@ export class HttpClient {
     }
 
     return {
-      body: body as T,
+      body,
       headers: response.headers ?? {},
-    };
+    } as RequestReturn<T>;
   }
 }
 

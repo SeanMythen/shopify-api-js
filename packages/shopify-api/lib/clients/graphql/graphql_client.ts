@@ -1,3 +1,6 @@
+import type {TypedDocumentNode} from '@graphql-typed-document-node/core';
+import {print} from 'graphql';
+
 import {ApiVersion, ShopifyHeader} from '../../types';
 import {ConfigInterface} from '../../base-types';
 import {httpClientClass, HttpClient} from '../http_client/http_client';
@@ -6,7 +9,7 @@ import {Session} from '../../session/session';
 import {logger} from '../../logger';
 import * as ShopifyErrors from '../../error';
 
-import {GraphqlParams, GraphqlClientParams} from './types';
+import {GraphqlClientParams, GraphqlParams} from './types';
 
 export interface GraphqlClientClassParams {
   config: ConfigInterface;
@@ -47,12 +50,13 @@ export class GraphqlClient {
     });
   }
 
-  public async query<T = unknown>(
-    params: GraphqlParams,
+  public async query<T = any>(
+    params: GraphqlParams<T>,
   ): Promise<RequestReturn<T>> {
     if (
       (typeof params.data === 'string' && params.data.length === 0) ||
-      Object.entries(params.data).length === 0
+      (typeof params.data === 'object' &&
+        Object.entries(params.data!).length === 0)
     ) {
       throw new ShopifyErrors.MissingRequiredArgument('Query missing.');
     }
@@ -68,6 +72,9 @@ export class GraphqlClient {
 
     if (typeof params.data === 'object') {
       dataType = DataType.JSON;
+      if (typeof params.data.query !== 'string') {
+        params.data.query = print(params.data.query as TypedDocumentNode);
+      }
     } else {
       dataType = DataType.GraphQL;
     }

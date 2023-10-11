@@ -1,0 +1,3 @@
+#! /usr/bin/env bash
+
+npx graphql-codegen -c node_modules/@shopify/shopify-api/codegen/config.ts
