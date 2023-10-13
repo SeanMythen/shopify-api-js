@@ -47,12 +47,13 @@ export class GraphqlClient {
     });
   }
 
-  public async query<T = unknown>(
-    params: GraphqlParams,
+  public async query<T = any>(
+    params: GraphqlParams<T>,
   ): Promise<RequestReturn<T>> {
     if (
       (typeof params.data === 'string' && params.data.length === 0) ||
-      Object.entries(params.data).length === 0
+      (typeof params.data === 'object' &&
+        Object.entries(params.data!).length === 0)
     ) {
       throw new ShopifyErrors.MissingRequiredArgument('Query missing.');
     }

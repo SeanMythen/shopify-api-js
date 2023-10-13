@@ -2,7 +2,10 @@ import {ApiVersion} from '../../types';
 import {Session} from '../../session/session';
 import {PostRequestParams, RequestReturn} from '../http_client/types';
 
-export type GraphqlParams = Omit<PostRequestParams, 'path' | 'type'>;
+export type GraphqlParams<T = any> = Omit<
+  PostRequestParams<T>,
+  'path' | 'type'
+>;
 
 export interface GraphqlClientParams {
   session: Session;

@@ -2,6 +2,38 @@ import {Method} from '@shopify/network';
 
 import {Headers} from '../../../runtime/http';
 
+export interface AdminQueries {
+  [key: string]: {return: any; variables?: any};
+}
+
+export interface AdminMutations {
+  [key: string]: {return: any; variables?: any};
+}
+
+type AdminOperations = AdminQueries & AdminMutations;
+
+type OperationRequest<
+  OperationQueries extends AdminOperations,
+  T extends keyof OperationQueries,
+> = OperationQueries[T]['variables'] extends {[key: string]: never}
+  ? {query: T; variables?: never}
+  : {
+      query: T;
+      variables: {
+        [k in keyof OperationQueries[T]['variables']]: 'input' extends keyof OperationQueries[T]['variables'][k]
+          ? OperationQueries[T]['variables'][k]['input']
+          : OperationQueries[T]['variables'][k];
+      };
+    };
+
+export type RequestData<T> = T extends keyof AdminOperations
+  ? OperationRequest<AdminOperations, T>
+  : {[key: string]: unknown} | string;
+
+export type ReturnBody<T> = T extends keyof AdminOperations
+  ? {data: AdminOperations[T]['return']}
+  : any;
+
 export interface HeaderParams {
   [key: string]: string | number | string[];
 }
@@ -21,28 +53,31 @@ export type QueryParams =
   | number[]
   | {[key: string]: QueryParams};
 
-export interface GetRequestParams {
+export interface GetRequestParams<T = any> {
   path: string;
   type?: DataType;
-  data?: {[key: string]: unknown} | string;
+  data?: RequestData<T>;
   query?: {[key: string]: QueryParams};
   extraHeaders?: HeaderParams;
   tries?: number;
 }
 
-export type PostRequestParams = GetRequestParams & {
-  data: {[key: string]: unknown} | string;
+export type PostRequestParams<T = any> = GetRequestParams<T> & {
+  data: RequestData<T>;
 };
 
-export type PutRequestParams = PostRequestParams;
+export type PutRequestParams<T = any> = PostRequestParams<T>;
 
-export type DeleteRequestParams = GetRequestParams;
+export type DeleteRequestParams<T = any> = GetRequestParams<T>;
 
-export type RequestParams = (GetRequestParams | PostRequestParams) & {
+export type RequestParams<T = any> = (
+  | GetRequestParams<T>
+  | PostRequestParams<T>
+) & {
   method: Method;
 };
 
-export interface RequestReturn<T = unknown> {
-  body: T;
+export interface RequestReturn<T = any> {
+  body: ReturnBody<T>;
   headers: Headers;
 }

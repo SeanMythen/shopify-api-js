@@ -70,8 +70,14 @@
     "node-fetch": "^2.6.7"
   },
   "dependencies": {
+    "@graphql-codegen/cli": "^5.0.0",
+    "@graphql-codegen/introspection": "^4.0.0",
+    "@graphql-codegen/typescript": "^4.0.1",
+    "@parcel/watcher": "^2.3.0",
+    "@shopify/hydrogen-codegen": "^0.0.2",
     "@shopify/network": "^3.2.1",
     "compare-versions": "^5.0.3",
+    "graphql": "^16.8.1",
     "isbot": "^3.6.10",
     "jose": "^4.9.1",
     "node-fetch": "^2.6.1",

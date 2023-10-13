@@ -10,6 +10,7 @@
     "adapters/**/*.ts",
     "rest/**/*.ts",
     "runtime/**/*.ts",
+    "codegen/**/*.ts",
   ],
   "exclude": [
     "**/*.test.ts", "**/test/*", "**/__tests__/*",
